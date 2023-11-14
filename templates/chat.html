@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Welcome, {{ username }}!</h1>
+    <div id="messages"></div>
+    <form id="messageForm">
+        <input type="text" id="messageInput" autocomplete="off" />
+        <button type="button" onclick="sendMessage()">Send</button>
+    </form>
+    <form action="{{ url_for('logout') }}" method="post">
+        <input type="submit" value="Logout">
+    </form>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('message', function(msg) {
+            var messagesDiv = document.getElementById('messages');
+            var messageDiv = document.createElement('div');
+            messageDiv.textContent = msg.sender + ': ' + msg.text;
+            messagesDiv.appendChild(messageDiv);
+        });
+
+        function sendMessage() {
+            var messageInput = document.getElementById('messageInput');
+            var message = messageInput.value;
+            socket.emit('message', message);
+            messageInput.value = '';
+        }
+    </script>
+</body>
+</html>
